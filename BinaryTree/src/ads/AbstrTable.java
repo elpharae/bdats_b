@@ -112,8 +112,8 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
 
             // pokud ma koren dva potomky
             // hledame nahradu za odebirany prvek v prave casti naseho korene
-            // v podobe nejblizsiho naslednika odebiraneho prvku
-            koren = nejmensiNaslednik(koren.prava);
+            // v podobe nejblizsiho naslednika odebiraneho prvku v danem substromu
+            koren.klic = nejmensiNaslednik(koren.prava);
 
             // odstraneni nejmensiho naslednika
             // jelikoz nahradil odebirany prvek
@@ -123,16 +123,38 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
         return koren;
     }
 
-    private Node nejmensiNaslednik(Node koren) {
+    private K nejmensiNaslednik(Node koren) {
+        K nejmensiKlic = koren.klic;
         while (koren.leva != null) {
+            nejmensiKlic = koren.leva.klic;
             koren = koren.leva;
         }
-        return koren;
+        return nejmensiKlic;
     }
 
     @Override
-    public Iterator iterator(ETypProhlidky typProhlidky) {
+    public Iterator<V> iterator(ETypProhlidky typProhlidky) {
+        if (typProhlidky == null) throw new IllegalArgumentException("Spatne zadany typ prohlidky");
+
+        switch (typProhlidky) {
+            case HLUBOKA -> {
+                return iteratorHluboka();
+            } 
+            case SIROKA -> {
+                return iteratorSiroka(this.koren);        
+            }
+        }
+
         return null;
     }
-    
+
+    private Iterator<V> iteratorHluboka() {
+        Node koren = this.koren;
+        AbstrLifo<V> zasobnik = new AbstrLifo<V>();
+    }
+
+    private Iterator<V> iteratorSiroka(Node koren) {
+        
+    }
+
 }
