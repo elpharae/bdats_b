@@ -34,7 +34,10 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
     }
 
     @Override
-    public V najdi(K klic) {
+    public V najdi(K klic) throws AbstrTableException {
+        if (jePrazdny()) throw new AbstrTableException("Strom je prazdny");
+        if (klic == null) throw new NullPointerException("Spatne zadany klic");
+
         return najdiRekurze(this.koren, klic);
     }
 
@@ -58,6 +61,9 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
 
     @Override
     public void vloz(K klic, V hodnota) {
+        if (klic == null) throw new NullPointerException("Spatne zadany klic");
+        if (hodnota == null) throw new NullPointerException("Spatne zadana hodnota");
+
         this.koren = vlozRekurze(this.koren, klic, hodnota);
     }
 
@@ -78,30 +84,49 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
     }
 
     @Override
-    public V odeber(K klic) {
+    public V odeber(K klic) throws AbstrTableException {
+        if (jePrazdny()) throw new AbstrTableException("Strom je prazdny");
+        if (klic == null) throw new NullPointerException("Spatne zadany klic");
+
         return odeberRekurze(this.koren, klic).hodnota;
     }
 
     private Node odeberRekurze(Node koren, K klic) {
+        // pokud neexistuje korenovy prvek
+        // v rekurznim zasobniku se vracime o krok zpet
         if (koren == null) return koren;
 
+        // pokud je poskytnuty klic mensi nez klic korenoveho prvku
+        // hledani odebiraneho prvku rekurzivne pokracuje po leve strane korenoveho prvku
         if (klic.compareTo(koren.klic) < 0) koren.leva = odeberRekurze(koren.leva, klic);
+        // pokud je poskytnuty klic mensi nez klic korenoveho prvku
+        // hledani odebiraneho prvku rekurzivne pokracuje po leve strane korenoveho prvku
         else if (klic.compareTo(koren.klic) > 0) koren.prava = odeberRekurze(koren.prava, klic);
+        // pokud se rovnaji
+        // pokracuje se vyhodnocenim, zda koren ma jeden, dva ci zadneho potomka
         else {
+            // pokud koren ma pouze jeden prvek
+            // v rekurzivnim zasobniku pokracujeme k existujicimu potomkovi
             if (koren.leva == null) return koren.prava;
             else if (koren.prava == null) return koren.leva;
 
-            K min = koren.klic;
+            // pokud ma koren dva potomky
+            // hledame nahradu za odebirany prvek v prave casti naseho korene
+            // v podobe nejblizsiho naslednika odebiraneho prvku
+            koren = nejmensiNaslednik(koren.prava);
 
-            while (koren.leva != null) {
-                min = koren.leva.klic;
-                koren = koren.leva;
-            }
-
-            koren.klic = min;
+            // odstraneni nejmensiho naslednika
+            // jelikoz nahradil odebirany prvek
             koren.prava = odeberRekurze(koren.prava, koren.klic);
         }
 
+        return koren;
+    }
+
+    private Node nejmensiNaslednik(Node koren) {
+        while (koren.leva != null) {
+            koren = koren.leva;
+        }
         return koren;
     }
 

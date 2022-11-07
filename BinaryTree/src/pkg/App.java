@@ -14,7 +14,9 @@ public class App {
         bst.vloz(30, "30");
         bst.vloz(40, "40");
 
-        System.out.println(bst.najdi(30));
+        System.out.println("pred");
+        bst.odeber(30);
+        System.out.println("po");
 
     }
 
