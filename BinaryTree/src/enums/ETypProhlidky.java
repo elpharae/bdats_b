@@ -1,13 +1,13 @@
 package enums;
 
-public enum ETypIt {
+public enum ETypProhlidky {
     
     SIROKA("Široká"),
     HLUBOKA("Hluboká");
 
     private String nazev;
 
-    ETypIt(String nazev) {
+    ETypProhlidky(String nazev) {
         this.nazev = nazev;
     }
 

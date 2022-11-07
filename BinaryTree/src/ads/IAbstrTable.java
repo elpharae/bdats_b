@@ -1,9 +1,9 @@
 package ads;
 
 import java.util.Iterator;
-import enums.ETypIt;
+import enums.ETypProhlidky;
 
-public interface IAbstrTable<K, V> {
+public interface IAbstrTable<K extends Comparable<K>, V> {
 
     void zrus();
     boolean jePrazdny();
@@ -11,6 +11,6 @@ public interface IAbstrTable<K, V> {
     V najdi(K key);
     void vloz(K key, V value);
     V odeber(K key);
-    Iterator iterator(ETypIt typIterace);
+    Iterator iterator(ETypProhlidky typProhlidky);
 
 }
