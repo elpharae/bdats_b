@@ -661,7 +661,7 @@ W  STRNMO          N48 54.5624 E017 18.7182 Fri Dec 22 07:47:09 2000 STRAZNICE N
 W  MIROSL          N48 56.9300 E016 19.0399 Fri Dec 22 07:46:40 2000 MIROSLAV            ^   18^Black       ^S+N^0
 W  LIBLIN          N49 55.0138 E013 32.7814 Fri Dec 22 07:43:32 2000 LIBLIN              ^   18^Black       ^S+N^0
 W  MIROSV          N49 41.3075 E013 39.6719 Fri Dec 22 07:46:41 2000 MIROSOV             ^   18^Black       ^S+N^0
-W  STA SM          N49 31.5009 E013 44.8971 Fri Dec 22 07:47:06 2000 STARY  SMOLIVEC     ^   18^Black       ^S+N^0
+W  STASM           N49 31.5009 E013 44.8971 Fri Dec 22 07:47:06 2000 STARY  SMOLIVEC     ^   18^Black       ^S+N^0
 W  VYSUSL          N49 48.5250 E017 59.2461 Fri Dec 22 07:47:25 2000 VYSKOVICE U SLATINY ^   18^Black       ^S+N^0
 W  DOLADR          N50 37.2103 E016 06.8817 Fri Dec 22 07:43:06 2000 DOLNI ADRSPACH      ^   18^Black       ^S+N^0
 W  DOMSNI          N50 23.5607 E015 06.6177 Fri Dec 22 07:43:08 2000 DOMOUSNICE          ^   18^Black       ^S+N^0

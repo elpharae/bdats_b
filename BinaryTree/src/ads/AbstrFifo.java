@@ -6,10 +6,13 @@ public class AbstrFifo<T> implements IAbstrLifoFifo<T> {
     
     private AbstrDoubleList<T> struktura;
 
+    public AbstrFifo() {
+        struktura = new AbstrDoubleList<T>();
+    }
+
     @Override
     public void zrus() {
         struktura.zrus();
-        
     }
 
     @Override

@@ -1,9 +1,12 @@
 package ads;
 
 import java.util.Iterator;
+
 import enums.ETypProhlidky;
 
 public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V> {
+
+    private Node koren = null;
 
     private class Node {
 
@@ -19,9 +22,12 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
             this.prava = null;
         }
 
-    }
+        @Override
+        public String toString() {
+            return hodnota.toString();
+        }
 
-    private Node koren;
+    }
 
     @Override
     public void zrus() {
@@ -99,9 +105,11 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
         // pokud je poskytnuty klic mensi nez klic korenoveho prvku
         // hledani odebiraneho prvku rekurzivne pokracuje po leve strane korenoveho prvku
         if (klic.compareTo(koren.klic) < 0) koren.leva = odeberRekurze(koren.leva, klic);
+
         // pokud je poskytnuty klic mensi nez klic korenoveho prvku
         // hledani odebiraneho prvku rekurzivne pokracuje po leve strane korenoveho prvku
         else if (klic.compareTo(koren.klic) > 0) koren.prava = odeberRekurze(koren.prava, klic);
+        
         // pokud se rovnaji
         // pokracuje se vyhodnocenim, zda koren ma jeden, dva ci zadneho potomka
         else {
@@ -136,25 +144,38 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
     public Iterator<V> iterator(ETypProhlidky typProhlidky) {
         if (typProhlidky == null) throw new IllegalArgumentException("Spatne zadany typ prohlidky");
 
-        switch (typProhlidky) {
-            case HLUBOKA -> {
-                return iteratorHluboka();
-            } 
-            case SIROKA -> {
-                return iteratorSiroka(this.koren);        
+        IAbstrLifoFifo<Node> struktura = typProhlidky == ETypProhlidky.HLUBOKA ? new AbstrLifo<Node>() : new AbstrFifo<Node>();
+        struktura.vloz(this.koren);
+
+        return new Iterator<V>() {
+            private boolean init = true;
+                    
+            @Override
+            public boolean hasNext() {
+                return !struktura.jePrazdny() || init;
             }
-        }
 
-        return null;
+            @Override
+            public V next() {
+                if (init) init = false;
+
+                try {
+                    Node odebirany = struktura.odeber();
+
+                    if (struktura instanceof AbstrLifo) {
+                        if (odebirany.prava != null) struktura.vloz(odebirany.prava);
+                        if (odebirany.leva != null) struktura.vloz(odebirany.leva);
+                    } else {
+                        if (odebirany.leva != null) struktura.vloz(odebirany.leva);
+                        if (odebirany.prava != null) struktura.vloz(odebirany.prava);
+                    }
+
+                    return odebirany.hodnota;
+                } catch (AbstrDoubleListException e) {
+                    return null;
+                }
+            }
+        };
     }
-
-    private Iterator<V> iteratorHluboka() {
-        Node koren = this.koren;
-        AbstrLifo<V> zasobnik = new AbstrLifo<V>();
-    }
-
-    private Iterator<V> iteratorSiroka(Node koren) {
-        
-    }
-
+    
 }

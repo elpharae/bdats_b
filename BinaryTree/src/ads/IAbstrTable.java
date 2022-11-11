@@ -11,6 +11,6 @@ public interface IAbstrTable<K extends Comparable<K>, V> {
     V najdi(K key) throws AbstrTableException;
     void vloz(K key, V value);
     V odeber(K key) throws AbstrTableException;
-    Iterator iterator(ETypProhlidky typProhlidky);
+    Iterator<V> iterator(ETypProhlidky typProhlidky);
 
 }

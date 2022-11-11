@@ -240,6 +240,13 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         ListItem<T> pred = this.prvni.predchozi;
         ListItem<T> po = this.prvni.dalsi;
 
+        // v pripade, ze v seznamu je pouze jeden prvek
+        // vymaz cely seznam
+        if (odebirany == pred && odebirany == po && pred == po) {
+            zrus();
+            return odebirany.data;
+        }
+
         // navazani vztahu predchudce a naslednika tak, 
         // aby zmizel odebirany prvek
         pred.dalsi = po;
@@ -269,6 +276,13 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         ListItem<T> odebirany = this.posledni;
         ListItem<T> pred = this.posledni.predchozi;
         ListItem<T> po = this.posledni.dalsi;
+
+        // v pripade, ze v seznamu je pouze jeden prvek
+        // vymaz cely seznam
+        if (odebirany == pred && odebirany == po && pred == po) {
+            zrus();
+            return odebirany.data;
+        }
 
         // navazani vztahu predchudce a naslednika tak, 
         // aby zmizel odebirany prvek
@@ -302,6 +316,13 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         ListItem<T> pred = this.aktualni;
         ListItem<T> po = this.aktualni.dalsi.dalsi;
 
+        // v pripade, ze v seznamu je pouze jeden prvek
+        // vymaz cely seznam
+        if (odebirany == pred && odebirany == po && pred == po) {
+            zrus();
+            return odebirany.data;
+        }
+
         // navazani vztahu predchudce a naslednika tak, 
         // aby zmizel odebirany prvek
         pred.dalsi = po;
@@ -325,6 +346,13 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         ListItem<T> odebirany = this.aktualni.predchozi;
         ListItem<T> pred = this.aktualni.predchozi.predchozi;
         ListItem<T> po = this.aktualni;
+
+        // v pripade, ze v seznamu je pouze jeden prvek
+        // vymaz cely seznam
+        if (odebirany == pred && odebirany == po && pred == po) {
+            zrus();
+            return odebirany.data;
+        }
 
         // navazani vztahu predchudce a naslednika tak, 
         // aby zmizel odebirany prvek
