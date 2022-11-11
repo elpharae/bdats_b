@@ -8,18 +8,23 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import ads.AbstrTable;
+import ads.AbstrTableException;
 import enums.ETypKlice;
 import enums.ETypProhlidky;
 
 public class Pamatky implements IPamatky<Zamek> {
 
-    private AbstrTable<Float, Zamek> strom;
+    //vymyslet elegantnejsi reseni nez tyhle fkin raw typy
+    private AbstrTable strom;
+
     private Zamek koren;
+    private ETypKlice aktualniKlic;
 
     private static final float PREVOD_NA_STUPNE = 1/60f;
 
     public Pamatky() {
-        this.strom = new AbstrTable<Float, Zamek>();
+        this.strom = new AbstrTable();
+        this.aktualniKlic = ETypKlice.NAZEV;
     }
 
     @Override
@@ -39,8 +44,10 @@ public class Pamatky implements IPamatky<Zamek> {
             while ((radek = reader.readLine()) != null) {
                 if (radek.length() == 0 || radek.isEmpty()) break;
 
+                if(pocet == 0) radek = radek.substring(3);
+
                 radek = radek.replaceAll("^", " ");
-                String nazev = radek.substring(69, 91).trim();
+                String nazev = radek.substring(69, 90).trim();
 
                 radek = radek.replaceAll("\\s+"," ").trim();
                 String[] radekData = radek.split(" ");
@@ -56,55 +63,84 @@ public class Pamatky implements IPamatky<Zamek> {
                 GPS lokace = new GPS(sirka, delka);
                 Zamek zamek = new Zamek(nazev, lokace);
 
-                if (strom.jePrazdny()) {
-                    this.koren = zamek;
-                    strom.vloz(0f, zamek);
-                } else {
-                    Float vzdalenostOdKorene = zamek.getLokace().vzdalenostOd(this.koren.getLokace());
-                    strom.vloz(vzdalenostOdKorene, zamek);
-                }
-
+                vlozZamek(zamek);
                 pocet++;
             }
-
-            System.out.println("POCET ZAMKU V STROMU:" + strom.getPocet());
             
             return pocet;
         } catch (IOException | NumberFormatException e) {
             strom.zrus();
-            e.printStackTrace();
             throw new PamatkyException("Chyba pri nacitani souboru");
         }
     }
 
     @Override
     public void vlozZamek(Zamek zamek) {
-        // TODO Auto-generated method stub
-        
+        switch (this.aktualniKlic) {
+            case GPS -> {
+                if (this.strom.jePrazdny()) {
+                    this.koren = zamek;
+                    this.strom.vloz(0f, zamek);
+                } else {
+                    float vzdalenostOdKorene = zamek.getLokace().vzdalenostOd(this.koren.getLokace());
+                    strom.vloz(vzdalenostOdKorene, zamek);
+                }
+            }
+            case NAZEV -> {
+                if (this.strom.jePrazdny()) this.koren = zamek;
+
+                this.strom.vloz(zamek.getNazev(), zamek);
+            }
+        }
     }
 
     @Override
-    public Zamek najdiZamek(String klic) {
-        // TODO Auto-generated method stub
-        return null;
+    public Zamek najdiZamek(Object klic) throws PamatkyException, AbstrTableException {
+        if (this.strom.jePrazdny()) throw new PamatkyException("Neni kde vyhledavat");
+        if (klic == null) throw new NullPointerException("Spatne zadany klic");
+
+        switch (aktualniKlic) {
+            case GPS -> {
+                return (Zamek) this.strom.najdi((float) ((GPS) klic).vzdalenostOd(this.koren.getLokace()));
+            }
+            case NAZEV -> {
+                return (Zamek) this.strom.najdi((String) klic);
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
     @Override
-    public Zamek odeberZamek(String klic) {
-        // TODO Auto-generated method stub
-        return null;
+    public Zamek odeberZamek(Object klic) throws PamatkyException, AbstrTableException {
+        if (this.strom.jePrazdny()) throw new PamatkyException("Neni kde vyhledavat");
+        if (klic == null) throw new NullPointerException("Spatne zadany klic");
+
+        switch (aktualniKlic) {
+            case GPS -> {
+                return (Zamek) this.strom.odeber((float) ((GPS) klic).vzdalenostOd(this.koren.getLokace()));
+            }
+            case NAZEV -> {
+                return (Zamek) this.strom.odeber((String) klic);
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
     @Override
-    public Zamek najdiNejbliz(String klic) {
+    public Zamek najdiNejbliz(Object klic) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void zrus() {
-        // TODO Auto-generated method stub
-        
+        strom.zrus();
+        this.koren = null;
+        this.aktualniKlic = ETypKlice.NAZEV;
     }
 
     @Override
@@ -115,13 +151,12 @@ public class Pamatky implements IPamatky<Zamek> {
 
     @Override
     public void nastavKlic(ETypKlice typKlice) {
-        // TODO Auto-generated method stub
-        
+        this.aktualniKlic = typKlice;
     }
 
     @Override
-    public Iterator<Zamek> iterator() {
-        return strom.iterator(ETypProhlidky.HLUBOKA);
+    public Iterator<Zamek> iterator(ETypProhlidky typProhlidky) {
+        return strom.iterator(typProhlidky);
     }
     
 }

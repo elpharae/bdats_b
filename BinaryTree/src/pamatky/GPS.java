@@ -1,6 +1,6 @@
 package pamatky;
 
-public class GPS implements IGPS {
+public class GPS implements IGPS, Comparable<GPS> {
     
     private float sirka;
     private float delka;
@@ -30,6 +30,16 @@ public class GPS implements IGPS {
 
         return (float) (POLOMER_ZEME * c * 1000);
     }
-    
 
+    //predelat
+    @Override
+    public int compareTo(GPS gps) {
+        if (this.sirka > gps.sirka || this.delka > gps.delka) return 1;
+        if (this.sirka < gps.sirka || this.delka < gps.delka) return -1;
+        if (this.sirka == gps.sirka && this.delka == gps.delka) return 0;
+
+        // sem se to nikdy nedostane
+        return 1; 
+    }
+    
 }

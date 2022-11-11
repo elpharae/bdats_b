@@ -36,7 +36,7 @@ public class Zamek implements Comparable<Zamek> {
 
     @Override
     public String toString() {
-        return this.id + " " + this.nazev + " " + this.lokace.getSirka() + " " +  this.lokace.getDelka();
+        return this.id + " " + this.nazev + " N" + this.lokace.getSirka() + " E0" +  this.lokace.getDelka();
     }
 
 }
