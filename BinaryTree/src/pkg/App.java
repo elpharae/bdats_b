@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import ads.AbstrTableException;
 import enums.ETypKlice;
 import enums.ETypProhlidky;
+import pamatky.GPS;
 import pamatky.Pamatky;
 import pamatky.PamatkyException;
 import pamatky.Zamek;
@@ -34,25 +35,24 @@ public class App {
         }
 
         ar.sort((o1, o2) -> {
-            if (Float.parseFloat(o1.getLokace().toString()) > Float.parseFloat(o2.getLokace().toString())) return -1;
-            else if (Float.parseFloat(o1.getLokace().toString()) < (Float.parseFloat(o2.getLokace().toString()))) return 1;
-            else return 0;
+            return o1.getLokace().compareTo(o2.getLokace()) * -1;
         });
 
-        //System.out.println(ar.get(ar.size() - 2).getLokace().toString());
+        System.out.println(ar.get(ar.size() - 1).getLokace().toString());
 
         try {
             pamatky.nastavKlic(ETypKlice.GPS);
-            System.out.println(pamatky.najdiNejbliz("50.0000 16.0000"));
+            Zamek x = pamatky.najdiNejbliz("49.0000 13.0000");
+            GPS lokace = new GPS(49.0000f, 13.0000f, x.getLokace());
+            System.out.println(x.toString());
+            System.out.println(lokace.toString() + " km");
+
         } catch (PamatkyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (AbstrTableException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-
+        
     }
 
 }

@@ -8,10 +8,6 @@ public class GPS implements Comparable<GPS> {
     private GPS koren;
 
     public GPS(float sirka, float delka, GPS koren) {
-        System.out.println(sirka);
-        System.out.println(delka);
-
-
         if (sirka < 48f || sirka >= 52f || delka < 12f || delka >= 19f) {
             throw new IllegalArgumentException("Pouze Ceske uzemi");
         }
