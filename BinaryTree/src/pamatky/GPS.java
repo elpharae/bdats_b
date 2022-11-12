@@ -5,9 +5,20 @@ public class GPS implements Comparable<GPS> {
     private float sirka;
     private float delka;
 
-    public GPS(float sirka, float delka) {
+    private GPS koren;
+
+    public GPS(float sirka, float delka, GPS koren) {
+        System.out.println(sirka);
+        System.out.println(delka);
+
+
+        if (sirka < 48f || sirka >= 52f || delka < 12f || delka >= 19f) {
+            throw new IllegalArgumentException("Pouze Ceske uzemi");
+        }
+
         this.sirka = sirka;
         this.delka = delka;
+        this.koren = koren;
     }
 
     public float getSirka() {
@@ -18,8 +29,12 @@ public class GPS implements Comparable<GPS> {
         return delka;
     }
 
-    public float getVzdalenost() {
-        return vzdalenostOd(Pamatky.koren.getLokace());
+    public GPS getKoren() {
+        return koren;
+    }
+
+    public void setKoren(GPS koren) {
+        this.koren = koren;
     }
 
     private float vzdalenostOd(GPS gps) {
@@ -39,17 +54,18 @@ public class GPS implements Comparable<GPS> {
     }
 
     @Override
-    public int compareTo(GPS gps) {
-        GPS koren = Pamatky.koren.getLokace();
+    public String toString() {
+        return Float.toString(this.vzdalenostOd(this.koren));
+    }
 
-        float vzdalenost1 = this.vzdalenostOd(koren);
-        float vzdalenost2 = gps.vzdalenostOd(koren);
+    @Override
+    public int compareTo(GPS gps) {
+        float vzdalenost1 = this.vzdalenostOd(this.koren);
+        float vzdalenost2 = gps.vzdalenostOd(this.koren);
 
         if (vzdalenost1 < vzdalenost2) return -1;
         else if (vzdalenost1 > vzdalenost2) return 1;
         else return 0;
     }
-
-
     
 }

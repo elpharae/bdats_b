@@ -14,7 +14,7 @@ public interface IPamatky {
     
     Zamek najdiZamek(String klic) throws PamatkyException, AbstrTableException;
     Zamek odeberZamek(String klic) throws PamatkyException, AbstrTableException;
-    Zamek najdiNejbliz(String klic) throws PamatkyException;
+    Zamek najdiNejbliz(String klic) throws PamatkyException, AbstrTableException;
 
     void zrus();
     void prebuduj();
