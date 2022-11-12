@@ -7,20 +7,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.stream.Stream;
+
+import ads.AbstrDoubleList;
 import ads.AbstrTable;
 import ads.AbstrTableException;
 import enums.ETypKlice;
 import enums.ETypProhlidky;
 
-public class Pamatky implements IPamatky<Zamek> {
+public class Pamatky implements IPamatky {
 
-    //vymyslet elegantnejsi reseni nez tyhle fkin raw typy
     private AbstrTable strom;
-
-    private Zamek koren;
     private ETypKlice aktualniKlic;
 
     private static final float PREVOD_NA_STUPNE = 1/60f;
+
+    static Zamek koren;
 
     public Pamatky() {
         this.strom = new AbstrTable();
@@ -56,14 +58,13 @@ public class Pamatky implements IPamatky<Zamek> {
                 float sirkaM = Float.parseFloat(radekData[3]);
                 float delkaS = Float.parseFloat(radekData[4].substring(2));
                 float delkaM = Float.parseFloat(radekData[5]);
- 
                 float sirka = sirkaS + sirkaM * PREVOD_NA_STUPNE;
                 float delka = delkaS + delkaM * PREVOD_NA_STUPNE;
 
-                GPS lokace = new GPS(sirka, delka);
+                GPS lokace = new GPS(sirka, delka, this.koren == null ? null : this.koren.getLokace());
                 Zamek zamek = new Zamek(nazev, lokace);
-
                 vlozZamek(zamek);
+
                 pocet++;
             }
             
@@ -82,8 +83,7 @@ public class Pamatky implements IPamatky<Zamek> {
                     this.koren = zamek;
                     this.strom.vloz(0f, zamek);
                 } else {
-                    float vzdalenostOdKorene = zamek.getLokace().vzdalenostOd(this.koren.getLokace());
-                    strom.vloz(vzdalenostOdKorene, zamek);
+                    strom.vloz(zamek.getLokace().getVzdalenost(), zamek);
                 }
             }
             case NAZEV -> {
@@ -95,13 +95,13 @@ public class Pamatky implements IPamatky<Zamek> {
     }
 
     @Override
-    public Zamek najdiZamek(Object klic) throws PamatkyException, AbstrTableException {
-        if (this.strom.jePrazdny()) throw new PamatkyException("Neni kde vyhledavat");
+    public Zamek najdiZamek(String klic) throws PamatkyException, AbstrTableException {
+        if (this.strom.jePrazdny()) throw new PamatkyException("Neni kde vyhledavat, strom je prazdny");
         if (klic == null) throw new NullPointerException("Spatne zadany klic");
 
-        switch (aktualniKlic) {
+        switch (this.aktualniKlic) {
             case GPS -> {
-                return (Zamek) this.strom.najdi((float) ((GPS) klic).vzdalenostOd(this.koren.getLokace()));
+                return (Zamek) this.strom.najdi(((GPS) klic).getVzdalenost());
             }
             case NAZEV -> {
                 return (Zamek) this.strom.najdi((String) klic);
@@ -113,13 +113,14 @@ public class Pamatky implements IPamatky<Zamek> {
     }
 
     @Override
-    public Zamek odeberZamek(Object klic) throws PamatkyException, AbstrTableException {
-        if (this.strom.jePrazdny()) throw new PamatkyException("Neni kde vyhledavat");
+    public Zamek odeberZamek(String klic) throws PamatkyException, AbstrTableException {
+        if (this.strom.jePrazdny()) throw new PamatkyException("Neni co odebirat, strom je prazdny");
         if (klic == null) throw new NullPointerException("Spatne zadany klic");
+        if (klic.isEmpty()) throw new IllegalArgumentException("Prazdny klic");
 
         switch (aktualniKlic) {
             case GPS -> {
-                return (Zamek) this.strom.odeber((float) ((GPS) klic).vzdalenostOd(this.koren.getLokace()));
+                return (Zamek) this.strom.odeber(((GPS) klic).getVzdalenost());
             }
             case NAZEV -> {
                 return (Zamek) this.strom.odeber((String) klic);
@@ -131,9 +132,30 @@ public class Pamatky implements IPamatky<Zamek> {
     }
 
     @Override
-    public Zamek najdiNejbliz(Object klic) {
-        // TODO Auto-generated method stub
-        return null;
+    public Zamek najdiNejbliz(String klic) throws PamatkyException {
+        if (this.aktualniKlic != ETypKlice.GPS) throw new PamatkyException("Spatne predvoleny typ klice");
+        if (this.strom.jePrazdny()) throw new PamatkyException("Neni kde vyhledavat, strom je prazdny");
+        
+        if (klic == null) throw new NullPointerException("Spatne zadany klic");
+        if (klic.isEmpty()) throw new IllegalArgumentException("Prazdny klic");
+
+        Iterator<Zamek> it = this.strom.iterator(ETypProhlidky.HLUBOKA);
+        // prvni prvek z iteratoru ma vzdy vzdalenost 0
+        // nutno jej preskocit
+        it.next();
+
+        Zamek min = it.next();
+        while (it.hasNext()) {
+            Zamek x = it.next();
+
+            float vzdX = x.getLokace().getVzdalenost();
+            float vzdMin = min.getLokace().getVzdalenost();
+            if (vzdX < vzdMin) {
+                min = x;
+            }
+        }
+        
+        return min;
     }
 
     @Override

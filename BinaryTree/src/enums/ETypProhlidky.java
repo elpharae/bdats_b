@@ -2,8 +2,8 @@ package enums;
 
 public enum ETypProhlidky {
     
-    SIROKA("Široká"),
-    HLUBOKA("Hluboká");
+    SIROKA("Siroka"),
+    HLUBOKA("Hluboka");
 
     private String nazev;
 

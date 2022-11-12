@@ -7,14 +7,14 @@ import ads.AbstrTableException;
 import enums.ETypKlice;
 import enums.ETypProhlidky;
 
-public interface IPamatky<Zamek> {
+public interface IPamatky {
     
     int importDatZTXT(String soubor) throws FileNotFoundException, PamatkyException;
     void vlozZamek(Zamek zamek);
     
-    Zamek najdiZamek(Object klic) throws PamatkyException, AbstrTableException;
-    Zamek odeberZamek(Object klic) throws PamatkyException, AbstrTableException;
-    Zamek najdiNejbliz(Object klic);
+    Zamek najdiZamek(String klic) throws PamatkyException, AbstrTableException;
+    Zamek odeberZamek(String klic) throws PamatkyException, AbstrTableException;
+    Zamek najdiNejbliz(String klic) throws PamatkyException;
 
     void zrus();
     void prebuduj();

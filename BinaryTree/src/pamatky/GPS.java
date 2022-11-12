@@ -1,6 +1,6 @@
 package pamatky;
 
-public class GPS implements IGPS, Comparable<GPS> {
+public class GPS implements Comparable<GPS> {
     
     private float sirka;
     private float delka;
@@ -9,15 +9,22 @@ public class GPS implements IGPS, Comparable<GPS> {
         this.sirka = sirka;
         this.delka = delka;
     }
+
     public float getSirka() {
         return sirka;
     }
+    
     public float getDelka() {
         return delka;
     }
 
-    @Override
-    public float vzdalenostOd(GPS gps) {
+    public float getVzdalenost() {
+        return vzdalenostOd(Pamatky.koren.getLokace());
+    }
+
+    private float vzdalenostOd(GPS gps) {
+        if (gps == null) return 0f;
+
         final double POLOMER_ZEME = 6.37100;
 
         double f1 = this.sirka * Math.PI / 180;
@@ -31,15 +38,18 @@ public class GPS implements IGPS, Comparable<GPS> {
         return (float) (POLOMER_ZEME * c * 1000);
     }
 
-    //predelat
     @Override
     public int compareTo(GPS gps) {
-        if (this.sirka > gps.sirka || this.delka > gps.delka) return 1;
-        if (this.sirka < gps.sirka || this.delka < gps.delka) return -1;
-        if (this.sirka == gps.sirka && this.delka == gps.delka) return 0;
+        GPS koren = Pamatky.koren.getLokace();
 
-        // sem se to nikdy nedostane
-        return 1; 
+        float vzdalenost1 = this.vzdalenostOd(koren);
+        float vzdalenost2 = gps.vzdalenostOd(koren);
+
+        if (vzdalenost1 < vzdalenost2) return -1;
+        else if (vzdalenost1 > vzdalenost2) return 1;
+        else return 0;
     }
+
+
     
 }

@@ -2,7 +2,7 @@ package enums;
 
 public enum ETypKlice {
     
-    NAZEV("Název"),
+    NAZEV("Nazev"),
     GPS("GPS");
 
     private String nazev;
