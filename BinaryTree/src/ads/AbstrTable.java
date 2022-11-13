@@ -80,7 +80,9 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
 
         // pokud je poskytnuty klic mensi nez klic korenoveho prvku
         // hledani vhodneho mista na vlozeni rekurzivne pokracuje po leve strane korenoveho prvku
-        if (klic.compareTo(koren.klic) < 0) koren.leva = vlozRekurze(koren.leva, klic, hodnota);
+        if (klic.compareTo(koren.klic) < 0) {
+            koren.leva = vlozRekurze(koren.leva, klic, hodnota);
+        }
 
         // pokud je poskytnuty klic vetsi nez klic korenoveho prvku
         // hledani vhodneho mista na vlozeni rekurzivne pokracuje po prave strane korenoveho prvku

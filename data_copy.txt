@@ -1,0 +1,15 @@
+﻿W  PETUSE          N49 33.3690 E014 20.1690 Fri Dec 22 07:46:52 2000 PETROVICE U SEDLCAN ^   18^Black       ^S+N^0
+W  VELVSE          N50 22.7895 E014 44.6632 Fri Dec 22 07:47:19 2000 VELKE VSELISY       ^   18^Black       ^S+N^0
+W  DOLKOU          N49 03.9274 E016 28.4618 Fri Dec 22 07:43:07 2000 DOLNI KOUNICE       ^   18^Black       ^S+N^0
+W  DRITEN          N49 08.5790 E014 20.8478 Fri Dec 22 07:43:09 2000 DRITEN              ^   18^Black       ^S+N^0
+W  KOSNOR          N50 07.3245 E016 11.8987 Fri Dec 22 07:43:25 2000 KOSTELEC NAD ORLICI ^   18^Black       ^S+N^0
+W  VALTIC          N48 44.3606 E016 45.3169 Fri Dec 22 07:47:18 2000 VALTICE             ^   18^Black       ^S+N^0
+W  SINDEL          N50 18.1108 E012 36.1148 Fri Dec 22 07:47:02 2000 SINDELOVA           ^   18^Black       ^S+N^0
+W  STENOV          N49 40.1411 E013 23.7164 Fri Dec 22 07:47:08 2000 STENOVICE           ^   18^Black       ^S+N^0
+W  CHYSE           N50 06.3512 E013 14.7956 Fri Dec 22 07:43:02 2000 CHYSE               ^   18^Black       ^S+N^0
+W  HOLVPO          N50 22.5719 E015 34.6614 Fri Dec 22 07:43:12 2000 HOLOVOUSY V PODKRKON^   18^Black       ^S+N^0
+W  ROKVOR          N50 09.9689 E016 27.8094 Fri Dec 22 07:47:00 2000 ROKYTNICE V ORLICKYC^   18^Black       ^S+N^0
+W  SLATIN          N49 55.0717 E015 48.6536 Fri Dec 22 07:47:04 2000 SLATINANY           ^   18^Black       ^S+N^0
+W  VSERAD          N49 52.3655 E014 06.3352 Fri Dec 22 07:47:24 2000 VSERADICE           ^   18^Black       ^S+N^0
+W  HORVPO          N50 22.1947 E015 38.3124 Fri Dec 22 07:43:14 2000 HORICE V PODKRKONOSI^   18^Black       ^S+N^0
+W  LITULT          N49 54.2259 E017 44.9144 Fri Dec 22 07:43:34 2000 LITULTOVICE         ^   18^Black       ^S+N^0

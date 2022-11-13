@@ -6,7 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import ads.AbstrTable;
 import ads.AbstrTableException;
 import enums.ETypKlice;
@@ -17,13 +21,11 @@ public class Pamatky implements IPamatky {
     private AbstrTable strom;
     private ETypKlice aktualniKlic;
 
-    private Zamek koren;
-
     private static final float PREVOD_NA_STUPNE = 1/60f;
 
     public Pamatky() {
         this.strom = new AbstrTable();
-        this.aktualniKlic = ETypKlice.NAZEV;
+        this.aktualniKlic = ETypKlice.GPS;
     }
 
     @Override
@@ -58,18 +60,11 @@ public class Pamatky implements IPamatky {
                 float sirka = sirkaS + sirkaM * PREVOD_NA_STUPNE;
                 float delka = delkaS + delkaM * PREVOD_NA_STUPNE;
 
-                GPS lokace;
-                Zamek zamek;
-                if (pocet == 0) {
-                    lokace = new GPS(sirka, delka, null);
-                    zamek = new Zamek(nazev, lokace);
-                    this.koren = zamek;
-                } else {
-                    lokace = new GPS(sirka, delka, this.koren.getLokace());
-                    zamek = new Zamek(nazev, lokace);
-                }
+                GPS lokace = new GPS(sirka, delka);
+                Zamek zamek = new Zamek(nazev, lokace);
 
                 vlozZamek(zamek);
+
                 pocet++;
             }
             
@@ -82,10 +77,8 @@ public class Pamatky implements IPamatky {
 
     @Override
     public void vlozZamek(Zamek zamek) {
-        if (this.strom.jePrazdny()) this.koren = zamek;
-
         switch (this.aktualniKlic) {
-            case GPS -> this.strom.vloz(Float.parseFloat(zamek.getLokace().toString()), zamek);
+            case GPS -> this.strom.vloz(zamek.getLokace(), zamek);
             case NAZEV -> this.strom.vloz(zamek.getNazev(), zamek);
         }
     }
@@ -98,7 +91,7 @@ public class Pamatky implements IPamatky {
 
         switch (this.aktualniKlic) {
             case GPS -> {
-                return (Zamek) this.strom.najdi(Float.parseFloat(stringToGPS(klic).toString()));
+                return (Zamek) this.strom.najdi(stringToGPS(klic).toString());
             }
             case NAZEV -> {
                 return (Zamek) this.strom.najdi(klic);
@@ -117,7 +110,7 @@ public class Pamatky implements IPamatky {
 
         switch (this.aktualniKlic) {
             case GPS -> {
-                return (Zamek) this.strom.odeber(Float.parseFloat(stringToGPS(klic).toString()));
+                return (Zamek) this.strom.odeber(stringToGPS(klic));
             }
             case NAZEV -> {
                 return (Zamek) this.strom.odeber(klic);
@@ -135,57 +128,97 @@ public class Pamatky implements IPamatky {
         if (klic == null || klic.isEmpty()) throw new IllegalArgumentException("Prazdny klic");
 
         Iterator<Zamek> it = this.strom.iterator(ETypProhlidky.SIROKA);
-        Zamek pocatek = new Zamek("Pocatecni lokace", stringToGPS(klic));
+        ArrayList<Zamek> vsechnyZamky = new ArrayList<Zamek>();
+        while (it.hasNext()) vsechnyZamky.add(it.next());
 
-        if (pocatek == null) throw new PamatkyException("Spatne zadany pocatecni bod");
+        GPS lokace = stringToGPS(klic);
 
-        Zamek min = null;
-        while (it.hasNext()) {
-            Zamek i = it.next();
-            i.getLokace().setKoren(pocatek.getLokace());
+        Zamek nejblizsi = vsechnyZamky.stream()
+            .sorted((z1, z2) -> {
+                if (z1.getLokace().vzdalenostOd(lokace) < z2.getLokace().vzdalenostOd(lokace)) return -1;
+                else if (z1.getLokace().vzdalenostOd(lokace) > z2.getLokace().vzdalenostOd(lokace)) return 1;
+                else return 0;
+            })
+            .findFirst()
+            .get();
 
-            if (min == null) {
-                min = i;
-                continue;
-            }
-
-            if (i.getLokace().compareTo(min.getLokace()) < 0) min = i;
-        }
-        
-        return min;
+        return nejblizsi;
     }
 
     private GPS stringToGPS(String gps) {
         String[] data = gps.split(" ");
-        if (data.length != 2) throw new IllegalArgumentException("Spatne zadana lokace, pouzijte format \"50.1234 50.1234\"");
+        if (data.length != 2) throw new IllegalArgumentException("Spatne zadana lokace, pouzijte format \"12.123456 12.123456\"");
 
-        GPS lokace = new GPS(Float.parseFloat(data[0]), Float.parseFloat(data[1]), null);
+        GPS lokace = new GPS(Float.parseFloat(data[0]), Float.parseFloat(data[1]));
         return lokace;
     }
 
     @Override
     public void zrus() {
         strom.zrus();
-        this.koren = null;
 
         this.aktualniKlic = ETypKlice.GPS;
     }
 
     @Override
     public void prebuduj() {
+        Iterator<Zamek> it = this.strom.iterator(ETypProhlidky.SIROKA);
+        ArrayList<Zamek> vsechnyZamky = new ArrayList<Zamek>();
+        while (it.hasNext()) {
+            vsechnyZamky.add(it.next());
+        }
+
+        ArrayList<Zamek> serazene = new ArrayList<Zamek>(vsechnyZamky.stream()
+        .sorted((z1, z2) -> {
+            if (this.aktualniKlic == ETypKlice.GPS) return z1.getLokace().compareTo(z2.getLokace());
+            else return z1.getNazev().compareTo(z2.getNazev());
+        }).toList());
+
+        AbstrTable novyStrom = new AbstrTable();
+        Zamek koren = serazene.get((int) (serazene.size() / 2));
+
+        if (aktualniKlic == ETypKlice.GPS) novyStrom.vloz(koren.getLokace(), koren);
+        else novyStrom.vloz(koren.getNazev(), koren);
+
+        ArrayList<Zamek> serazeneMensi = new ArrayList<Zamek>(serazene.subList(0, (int) (serazene.size() / 2)));
+        ArrayList<Zamek> serazeneVetsi = new ArrayList<Zamek>(serazene.subList((int) (serazene.size() / 2) + 1, serazene.size()));
+
+        while (!serazeneMensi.isEmpty() || !serazeneVetsi.isEmpty()) {
+            Zamek vkladanyMensi = null;
+            Zamek vkladanyVetsi = null;
+
+            if (!serazeneMensi.isEmpty()) {
+                vkladanyMensi = serazeneMensi.remove((int) (serazeneMensi.size() / 2));
+            }
+
+            if (!serazeneVetsi.isEmpty()) {
+                vkladanyVetsi = serazeneVetsi.remove((int) (serazeneVetsi.size() / 2));
+            }
+
+            if (vkladanyMensi != null) {
+                if (aktualniKlic == ETypKlice.GPS) novyStrom.vloz(vkladanyMensi.getLokace(), vkladanyMensi);
+                else novyStrom.vloz(vkladanyMensi.getNazev(), vkladanyMensi);
+            }
+
+            if (vkladanyVetsi != null) {
+                if (aktualniKlic == ETypKlice.GPS) novyStrom.vloz(vkladanyVetsi.getLokace(), vkladanyVetsi);
+                else novyStrom.vloz(vkladanyVetsi.getNazev(), vkladanyVetsi);
+            }
+        }
         
+        zrus();
+
+        this.strom = novyStrom;
     }
 
     @Override
     public void nastavKlic(ETypKlice typKlice) {
         this.aktualniKlic = typKlice;
-
-        prebuduj();
     }
 
     @Override
     public Iterator<Zamek> iterator(ETypProhlidky typProhlidky) {
-        return strom.iterator(typProhlidky);
+        return (Iterator<Zamek>) strom.iterator(typProhlidky);
     }
     
 }

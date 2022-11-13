@@ -1,20 +1,17 @@
 package pamatky;
 
-public class GPS implements Comparable<GPS> {
+public class GPS implements IGPS, Comparable<GPS> {
     
     private float sirka;
     private float delka;
 
-    private GPS koren;
-
-    public GPS(float sirka, float delka, GPS koren) {
+    public GPS(float sirka, float delka) {
         if (sirka < 48f || sirka >= 52f || delka < 12f || delka >= 19f) {
             throw new IllegalArgumentException("Pouze Ceske uzemi");
         }
 
         this.sirka = sirka;
         this.delka = delka;
-        this.koren = koren;
     }
 
     public float getSirka() {
@@ -25,16 +22,9 @@ public class GPS implements Comparable<GPS> {
         return delka;
     }
 
-    public GPS getKoren() {
-        return koren;
-    }
-
-    public void setKoren(GPS koren) {
-        this.koren = koren;
-    }
-
-    private float vzdalenostOd(GPS gps) {
-        if (gps == null) return 0f;
+    @Override
+    public float vzdalenostOd(GPS gps) {
+        if (gps == null || gps.equals(this)) return 0f;
 
         final double POLOMER_ZEME = 6.37100;
 
@@ -50,17 +40,9 @@ public class GPS implements Comparable<GPS> {
     }
 
     @Override
-    public String toString() {
-        return Float.toString(this.vzdalenostOd(this.koren));
-    }
-
-    @Override
     public int compareTo(GPS gps) {
-        float vzdalenost1 = this.vzdalenostOd(this.koren);
-        float vzdalenost2 = gps.vzdalenostOd(this.koren);
-
-        if (vzdalenost1 < vzdalenost2) return -1;
-        else if (vzdalenost1 > vzdalenost2) return 1;
+        if (this.sirka + this.delka < gps.sirka + gps.delka) return -1;
+        else if (this.sirka + this.delka > gps.sirka + gps.delka) return 1;
         else return 0;
     }
     
