@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Random;
 
 import ads.AbstrTable;
 import ads.AbstrTableException;
@@ -26,6 +26,85 @@ public class Pamatky implements IPamatky {
     public Pamatky() {
         this.strom = new AbstrTable();
         this.aktualniKlic = ETypKlice.GPS;
+    }
+
+    @Override
+    public int importDat(String soubor) throws PamatkyException, FileNotFoundException {
+        if (soubor.isEmpty()) throw new IllegalArgumentException("Vybrany soubor neexistuje");
+        if (!Files.exists(Paths.get(soubor))) throw new FileNotFoundException("Vybrany soubor neexistuje");
+
+        try (
+            BufferedReader reader = new BufferedReader(new FileReader(soubor));
+            ) 
+        {
+            strom.zrus();
+
+            String radek;
+            int pocet = 0;
+
+            while ((radek = reader.readLine()) != null) {
+                if (radek.length() == 0 || radek.isEmpty()) break;
+
+                String[] data = radek.split(" ");
+
+                int id = Integer.parseInt(data[0]);
+                float sirka = Float.parseFloat(data[1]);
+                float delka = Float.parseFloat(data[2]);
+                String nazev = data[3].replace("_", " ");
+
+                GPS lokace = new GPS(sirka, delka);
+                Zamek zamek = new Zamek(nazev, lokace);
+                zamek.setId(id);
+
+                vlozZamek(zamek);
+
+                pocet++;
+            }
+            
+            return pocet;
+        } catch (IOException | NumberFormatException e) {
+            strom.zrus();
+            throw new PamatkyException("Chyba pri nacitani souboru");
+        }
+    }
+
+    @Override
+    public String exportDat(ETypProhlidky typProhlidky) {
+        if (typProhlidky == null) throw new NullPointerException("Spatne zvoleny typ prohlidky");
+        StringBuilder fileContent = new StringBuilder();
+
+        Iterator<Zamek> iterator = this.strom.iterator(typProhlidky);
+        while (iterator.hasNext()) {
+            Zamek x = iterator.next();
+            fileContent.append(x.getId() + " " + x.getLokace().getSirka() + " " + x.getLokace().getDelka() + " " + x.getNazev().replace(" ", "_") + "\n");
+        }
+
+        return fileContent.toString();
+    }
+
+    @Override
+    public void generaceDat(int pocet) {
+        if (pocet <= 0) {
+            throw new IllegalArgumentException("Neplatny pocet nahodne generovanych dat");
+        }
+
+        Random rnd = new Random();
+        rnd.setSeed(new Date().getTime());
+        this.strom.zrus();
+    
+        String nazev;
+        float sirka;
+        float delka;
+        for (int i = 0; i < pocet; i++) {
+            sirka = rnd.nextFloat(GPS.MAX_SIRKA - GPS.MIN_SIRKA) + GPS.MIN_SIRKA;
+            delka = rnd.nextFloat(GPS.MAX_DELKA - GPS.MIN_DELKA) + GPS.MIN_DELKA;
+            nazev = "Zamek " + i;
+
+            Zamek x = new Zamek(nazev, new GPS(sirka, delka));
+
+            if (this.aktualniKlic == ETypKlice.GPS) this.strom.vloz(x.getLokace(), x);
+            else this.strom.vloz(x.getNazev(), x);
+        }
     }
 
     @Override
@@ -86,52 +165,51 @@ public class Pamatky implements IPamatky {
     @Override
     public Zamek najdiZamek(String klic) throws PamatkyException, AbstrTableException {
         if (this.strom.jePrazdny()) throw new PamatkyException("Neni kde vyhledavat, strom je prazdny");
-        if (klic == null) throw new NullPointerException("Spatne zadany klic");
-        if (klic.isEmpty()) throw new IllegalArgumentException("Prazdny klic");
+        if (klic == null) throw new NullPointerException("Prazdny klic");
+        if (klic.isEmpty()) throw new IllegalArgumentException("Spatne zadany nazev nebo souradnice");
 
         switch (this.aktualniKlic) {
             case GPS -> {
-                return (Zamek) this.strom.najdi(stringToGPS(klic).toString());
+                return (Zamek) this.strom.najdi(new GPS(klic));
             }
             case NAZEV -> {
                 return (Zamek) this.strom.najdi(klic);
             }
-            default -> {
-                return null;
-            }
         }
+
+        return null;
     }
 
     @Override
     public Zamek odeberZamek(String klic) throws PamatkyException, AbstrTableException {
         if (this.strom.jePrazdny()) throw new PamatkyException("Neni co odebirat, strom je prazdny");
-        if (klic == null) throw new NullPointerException("Spatne zadany klic");
-        if (klic.isEmpty()) throw new IllegalArgumentException("Prazdny klic");
+        if (klic == null) throw new NullPointerException("Prazdny klic");
+        if (klic.isEmpty()) throw new IllegalArgumentException("Spatne zadany nazev nebo souradnice");
 
         switch (this.aktualniKlic) {
             case GPS -> {
-                return (Zamek) this.strom.odeber(stringToGPS(klic));
+                return (Zamek) this.strom.odeber(new GPS(klic));
             }
             case NAZEV -> {
                 return (Zamek) this.strom.odeber(klic);
             }
-            default -> {
-                return null;
-            }
         }
+
+        return null;
     }
 
     @Override
     public Zamek najdiNejbliz(String klic) throws PamatkyException, AbstrTableException {
         if (this.aktualniKlic != ETypKlice.GPS) throw new PamatkyException("Spatne predvoleny typ klice");
         if (this.strom.jePrazdny()) throw new PamatkyException("Neni kde vyhledavat, strom je prazdny");
-        if (klic == null || klic.isEmpty()) throw new IllegalArgumentException("Prazdny klic");
+        if (klic == null) throw new NullPointerException("Prazdny klic");
+        if (klic.isEmpty()) throw new IllegalArgumentException("Spatne zadany nazev nebo souradnice");
 
         Iterator<Zamek> it = this.strom.iterator(ETypProhlidky.SIROKA);
         ArrayList<Zamek> vsechnyZamky = new ArrayList<Zamek>();
         while (it.hasNext()) vsechnyZamky.add(it.next());
 
-        GPS lokace = stringToGPS(klic);
+        GPS lokace = new GPS(klic);
 
         Zamek nejblizsi = vsechnyZamky.stream()
             .sorted((z1, z2) -> {
@@ -145,23 +223,17 @@ public class Pamatky implements IPamatky {
         return nejblizsi;
     }
 
-    private GPS stringToGPS(String gps) {
-        String[] data = gps.split(" ");
-        if (data.length != 2) throw new IllegalArgumentException("Spatne zadana lokace, pouzijte format \"12.123456 12.123456\"");
-
-        GPS lokace = new GPS(Float.parseFloat(data[0]), Float.parseFloat(data[1]));
-        return lokace;
-    }
-
     @Override
     public void zrus() {
         strom.zrus();
 
-        this.aktualniKlic = ETypKlice.GPS;
+        Zamek.count = 0;
     }
 
     @Override
-    public void prebuduj() {
+    public void prebuduj() throws PamatkyException {
+        if (this.strom.jePrazdny()) throw new PamatkyException("Neni co prebudovat, strom je prazdny");
+
         Iterator<Zamek> it = this.strom.iterator(ETypProhlidky.SIROKA);
         ArrayList<Zamek> vsechnyZamky = new ArrayList<Zamek>();
         while (it.hasNext()) {
@@ -217,8 +289,15 @@ public class Pamatky implements IPamatky {
     }
 
     @Override
-    public Iterator<Zamek> iterator(ETypProhlidky typProhlidky) {
-        return (Iterator<Zamek>) strom.iterator(typProhlidky);
+    public Iterator<Zamek> iterator(ETypProhlidky typProhlidky) throws PamatkyException {
+        if (this.strom.jePrazdny()) throw new PamatkyException("Neni co prohlizet, strom je prazdny");
+        if (typProhlidky == null) throw new NullPointerException("Spatne zvoleny typ prohlidky");
+
+        return strom.iterator(typProhlidky);
+    }
+
+    public ETypKlice getAktualniKlic() {
+        return aktualniKlic;
     }
     
 }

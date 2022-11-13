@@ -5,14 +5,39 @@ public class GPS implements IGPS, Comparable<GPS> {
     private float sirka;
     private float delka;
 
+    public static float MIN_SIRKA = 48f;
+    public static float MAX_SIRKA = 52f;
+    public static float MIN_DELKA = 12f;
+    public static float MAX_DELKA = 19f;
+
     public GPS(float sirka, float delka) {
-        if (sirka < 48f || sirka >= 52f || delka < 12f || delka >= 19f) {
+        if (sirka < GPS.MIN_SIRKA || sirka > GPS.MAX_SIRKA || delka < GPS.MIN_DELKA || delka > GPS.MAX_DELKA) {
             throw new IllegalArgumentException("Pouze Ceske uzemi");
         }
 
         this.sirka = sirka;
         this.delka = delka;
     }
+
+    public GPS(String souradnice) {
+        String[] data = souradnice.split(" ");
+        if (data.length != 2) throw new IllegalArgumentException("Spatne zadana lokace");
+
+        try {
+            float sirka = Float.parseFloat(data[0]);
+            float delka = Float.parseFloat(data[1]);
+            
+            if (sirka < GPS.MIN_SIRKA || sirka > GPS.MAX_SIRKA || delka < GPS.MIN_DELKA || delka > GPS.MAX_DELKA) throw new IllegalArgumentException("Pouze Ceske uzemi");
+
+            this.sirka = sirka;
+            this.delka = delka;
+
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Spatne zadana lokace");
+        }
+
+
+    } 
 
     public float getSirka() {
         return sirka;
@@ -37,6 +62,11 @@ public class GPS implements IGPS, Comparable<GPS> {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
         return (float) (POLOMER_ZEME * c * 1000);
+    }
+
+    @Override
+    public String toString() {
+        return this.sirka + " " + this.delka;
     }
 
     @Override

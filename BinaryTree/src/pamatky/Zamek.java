@@ -1,20 +1,24 @@
 package pamatky;
 
-public class Zamek implements Comparable<Zamek> {
+public class Zamek {
     
-    private static int count = 1;
+    static int count = 1;
 
     private int id;
     private String nazev;
     private GPS lokace;
 
     public Zamek(String nazev, GPS lokace) {
-        if (nazev == null || lokace == null) throw new NullPointerException();
-        if (nazev.isEmpty()) throw new IllegalArgumentException();
+        if (nazev == null || lokace == null) throw new NullPointerException("Spatne poskytnuty nazev nebo lokace");
+        if (nazev.isEmpty()) throw new IllegalArgumentException("Nazev je prazdny");
 
         this.id = count++;
-        this.nazev = nazev;
+        this.nazev = nazev.trim();
         this.lokace = lokace;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {
@@ -30,13 +34,8 @@ public class Zamek implements Comparable<Zamek> {
     }
 
     @Override
-    public int compareTo(Zamek zamek) {
-        return 0;
-    }
-
-    @Override
     public String toString() {
-        return this.id + " " + this.nazev + " N" + this.lokace.getSirka() + " E0" +  this.lokace.getDelka();
+        return this.id + ": " + this.lokace.getSirka() + " " +  this.lokace.getDelka() + " " + this.nazev;
     }
 
 }

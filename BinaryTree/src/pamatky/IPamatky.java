@@ -10,6 +10,9 @@ import enums.ETypProhlidky;
 public interface IPamatky {
     
     int importDatZTXT(String soubor) throws FileNotFoundException, PamatkyException;
+    int importDat(String soubor) throws PamatkyException, FileNotFoundException;
+    String exportDat(ETypProhlidky typProhlidky);
+    void generaceDat(int pocet);
     void vlozZamek(Zamek zamek);
     
     Zamek najdiZamek(String klic) throws PamatkyException, AbstrTableException;
@@ -17,9 +20,9 @@ public interface IPamatky {
     Zamek najdiNejbliz(String klic) throws PamatkyException, AbstrTableException;
 
     void zrus();
-    void prebuduj();
+    void prebuduj() throws PamatkyException;
     void nastavKlic(ETypKlice typKlice);
     
-    Iterator<Zamek> iterator(ETypProhlidky typProhlidky);
+    Iterator<Zamek> iterator(ETypProhlidky typProhlidky) throws PamatkyException;
 
 }
