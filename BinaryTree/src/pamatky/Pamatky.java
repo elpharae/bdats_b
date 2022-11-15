@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
-
 import ads.AbstrTable;
 import ads.AbstrTableException;
 import enums.ETypKlice;
@@ -155,11 +154,28 @@ public class Pamatky implements IPamatky {
     }
 
     @Override
-    public void vlozZamek(Zamek zamek) {
+    public void vlozZamek(Zamek zamek) throws PamatkyException {
+        if (zamek == null) throw new NullPointerException("Spatne zadana pamatka");
+
+        Zamek vlozeny;
         switch (this.aktualniKlic) {
-            case GPS -> this.strom.vloz(zamek.getLokace(), zamek);
-            case NAZEV -> this.strom.vloz(zamek.getNazev(), zamek);
+            case GPS -> {
+                vlozeny = (Zamek) this.strom.najdi(zamek.getLokace());
+                if (vlozeny != null) {
+                    throw new PamatkyException("Takova pamatka jiz ve stromu existuje");
+                } else {
+                    this.strom.vloz(zamek.getLokace(), zamek);
+                }
+            } case NAZEV -> {
+                vlozeny = (Zamek) this.strom.najdi(zamek.getNazev());
+                if (vlozeny != null) {
+                    throw new PamatkyException("Takova pamatka jiz ve stromu existuje");
+                } else {
+                    this.strom.vloz(zamek.getNazev(), zamek);
+                }
+            }
         }
+
     }
 
     @Override
@@ -198,6 +214,7 @@ public class Pamatky implements IPamatky {
         return null;
     }
 
+
     @Override
     public Zamek najdiNejbliz(String klic) throws PamatkyException, AbstrTableException {
         if (this.aktualniKlic != ETypKlice.GPS) throw new PamatkyException("Spatne predvoleny typ klice");
@@ -205,12 +222,17 @@ public class Pamatky implements IPamatky {
         if (klic == null) throw new NullPointerException("Prazdny klic");
         if (klic.isEmpty()) throw new IllegalArgumentException("Spatne zadany nazev nebo souradnice");
 
+        // pomoci iteratoru se vlozi vsechny zamky do kolekce arraylist
         Iterator<Zamek> it = this.strom.iterator(ETypProhlidky.SIROKA);
         ArrayList<Zamek> vsechnyZamky = new ArrayList<Zamek>();
         while (it.hasNext()) vsechnyZamky.add(it.next());
 
+        // za pomoci klice je vytvoren objekt gps 
         GPS lokace = new GPS(klic);
 
+        // kolekce arraylist je prevedena na stream a vzestupne serazena
+        // v zavislosti na vzdalenosti od lokace, ktera je zjistena z parametru klic
+        // po serazeni je ze streamu nalezen a vracen prvni prvek
         Zamek nejblizsi = vsechnyZamky.stream()
             .sorted((z1, z2) -> {
                 if (z1.getLokace().vzdalenostOd(lokace) < z2.getLokace().vzdalenostOd(lokace)) return -1;
@@ -234,31 +256,40 @@ public class Pamatky implements IPamatky {
     public void prebuduj() throws PamatkyException {
         if (this.strom.jePrazdny()) throw new PamatkyException("Neni co prebudovat, strom je prazdny");
 
+        // pomoci iteratoru se vlozi vsechny zamky do kolekce arraylist
         Iterator<Zamek> it = this.strom.iterator(ETypProhlidky.SIROKA);
         ArrayList<Zamek> vsechnyZamky = new ArrayList<Zamek>();
-        while (it.hasNext()) {
-            vsechnyZamky.add(it.next());
-        }
+        while (it.hasNext()) vsechnyZamky.add(it.next());
 
+        // vsechny zamky v kolekci arraylist jsou serazene vzestupne
+        // podle prave pouzivaneho klice
         ArrayList<Zamek> serazene = new ArrayList<Zamek>(vsechnyZamky.stream()
         .sorted((z1, z2) -> {
             if (this.aktualniKlic == ETypKlice.GPS) return z1.getLokace().compareTo(z2.getLokace());
             else return z1.getNazev().compareTo(z2.getNazev());
         }).toList());
 
+        // po serazeni zamku je vytvoren novy strom
+        // jehoz korenem bude prostredni hodnota serazene kolekce
         AbstrTable novyStrom = new AbstrTable();
         Zamek koren = serazene.get((int) (serazene.size() / 2));
 
+        // koren je vlozen s ruznym klicem v zavislosti na aktualne zvolenem klici,
+        // se kterym ma strom pracovat
         if (aktualniKlic == ETypKlice.GPS) novyStrom.vloz(koren.getLokace(), koren);
         else novyStrom.vloz(koren.getNazev(), koren);
 
+        // kolekce serazenych zamku je rozdelena na dve poloviny
+        // prvni polovina obsahuje vsechny zamky s klicem mensim nez koren
         ArrayList<Zamek> serazeneMensi = new ArrayList<Zamek>(serazene.subList(0, (int) (serazene.size() / 2)));
+        // druha polovina obsahuje vsechny zamky s klicem vetsim nez koren
         ArrayList<Zamek> serazeneVetsi = new ArrayList<Zamek>(serazene.subList((int) (serazene.size() / 2) + 1, serazene.size()));
 
+        Zamek vkladanyMensi = null;
+        Zamek vkladanyVetsi = null;
+        // obe nove kolekce jsou prochazeny cyklem while dokud nejsou obe kolekce prazdne
         while (!serazeneMensi.isEmpty() || !serazeneVetsi.isEmpty()) {
-            Zamek vkladanyMensi = null;
-            Zamek vkladanyVetsi = null;
-
+            // v kazde iteraci cyklu se z obou kolekci odebere jejich prostredni prvek
             if (!serazeneMensi.isEmpty()) {
                 vkladanyMensi = serazeneMensi.remove((int) (serazeneMensi.size() / 2));
             }
@@ -267,6 +298,7 @@ public class Pamatky implements IPamatky {
                 vkladanyVetsi = serazeneVetsi.remove((int) (serazeneVetsi.size() / 2));
             }
 
+            // ktery se vlozi do noveho stromu
             if (vkladanyMensi != null) {
                 if (aktualniKlic == ETypKlice.GPS) novyStrom.vloz(vkladanyMensi.getLokace(), vkladanyMensi);
                 else novyStrom.vloz(vkladanyMensi.getNazev(), vkladanyMensi);
@@ -278,8 +310,10 @@ public class Pamatky implements IPamatky {
             }
         }
         
+        // ...stary strom je zrusen
         zrus();
 
+        // a je nahrazen novym stromem...
         this.strom = novyStrom;
     }
 

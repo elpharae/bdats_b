@@ -6,16 +6,10 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "Launch with GUI",
+            "name": "Launch App",
             "request": "launch",
             "mainClass": "gui.App",
-            "projectName": "BinaryTree_a5ef5bf4",
+            "projectName": "BinaryTree_ddc8ca1a",
             "vmArgs": "--module-path \"C:/Program Files/Java/javafx-sdk-19/lib\" --add-modules javafx.controls,javafx.fxml"
         }
     ]

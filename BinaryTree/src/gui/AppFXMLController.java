@@ -254,7 +254,7 @@ public class AppFXMLController {
         
             textArea.setText("Uspesne vlozeno");
             naplnListView();
-        } catch (IllegalArgumentException | AppException e) {
+        } catch (IllegalArgumentException | PamatkyException | AppException e) {
             errorDialog(e.getMessage());
         }
     }

@@ -40,9 +40,9 @@ public class AbstrTable<K extends Comparable<K>, V> implements IAbstrTable<K, V>
     }
 
     @Override
-    public V najdi(K klic) throws AbstrTableException {
-        if (jePrazdny()) throw new AbstrTableException("Strom je prazdny");
+    public V najdi(K klic) {
         if (klic == null) throw new NullPointerException("Spatne zadany klic");
+        if (jePrazdny()) return null;
 
         return najdiRekurze(this.koren, klic);
     }

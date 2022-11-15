@@ -13,7 +13,7 @@ public interface IPamatky {
     int importDat(String soubor) throws PamatkyException, FileNotFoundException;
     String exportDat(ETypProhlidky typProhlidky);
     void generaceDat(int pocet);
-    void vlozZamek(Zamek zamek);
+    void vlozZamek(Zamek zamek) throws PamatkyException;
     
     Zamek najdiZamek(String klic) throws PamatkyException, AbstrTableException;
     Zamek odeberZamek(String klic) throws PamatkyException, AbstrTableException;
