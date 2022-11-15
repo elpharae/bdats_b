@@ -10,8 +10,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
+
+import ads.AbstrDoubleListException;
+import ads.AbstrFifo;
+import ads.AbstrLifo;
 import ads.AbstrTable;
 import ads.AbstrTableException;
+import ads.IAbstrLifoFifo;
 import enums.ETypKlice;
 import enums.ETypProhlidky;
 
@@ -256,65 +261,31 @@ public class Pamatky implements IPamatky {
     public void prebuduj() throws PamatkyException {
         if (this.strom.jePrazdny()) throw new PamatkyException("Neni co prebudovat, strom je prazdny");
 
-        // pomoci iteratoru se vlozi vsechny zamky do kolekce arraylist
         Iterator<Zamek> it = this.strom.iterator(ETypProhlidky.SIROKA);
         ArrayList<Zamek> vsechnyZamky = new ArrayList<Zamek>();
         while (it.hasNext()) vsechnyZamky.add(it.next());
 
-        // vsechny zamky v kolekci arraylist jsou serazene vzestupne
-        // podle prave pouzivaneho klice
         ArrayList<Zamek> serazene = new ArrayList<Zamek>(vsechnyZamky.stream()
         .sorted((z1, z2) -> {
             if (this.aktualniKlic == ETypKlice.GPS) return z1.getLokace().compareTo(z2.getLokace());
             else return z1.getNazev().compareTo(z2.getNazev());
         }).toList());
 
-        // po serazeni zamku je vytvoren novy strom
-        // jehoz korenem bude prostredni hodnota serazene kolekce
-        AbstrTable novyStrom = new AbstrTable();
-        Zamek koren = serazene.get((int) (serazene.size() / 2));
+        this.strom.zrus();
 
-        // koren je vlozen s ruznym klicem v zavislosti na aktualne zvolenem klici,
-        // se kterym ma strom pracovat
-        if (aktualniKlic == ETypKlice.GPS) novyStrom.vloz(koren.getLokace(), koren);
-        else novyStrom.vloz(koren.getNazev(), koren);
+        prebudujRekurze(serazene);
+    }
 
-        // kolekce serazenych zamku je rozdelena na dve poloviny
-        // prvni polovina obsahuje vsechny zamky s klicem mensim nez koren
-        ArrayList<Zamek> serazeneMensi = new ArrayList<Zamek>(serazene.subList(0, (int) (serazene.size() / 2)));
-        // druha polovina obsahuje vsechny zamky s klicem vetsim nez koren
-        ArrayList<Zamek> serazeneVetsi = new ArrayList<Zamek>(serazene.subList((int) (serazene.size() / 2) + 1, serazene.size()));
+    private void prebudujRekurze(ArrayList<Zamek> serazene) {
+        if (!serazene.isEmpty()) {
+            Zamek koren = serazene.remove((int) (serazene.size() / 2));
+            
+            this.strom.vloz(this.aktualniKlic == ETypKlice.GPS ? koren.getLokace() : koren.getNazev(), koren);
+            
 
-        Zamek vkladanyMensi = null;
-        Zamek vkladanyVetsi = null;
-        // obe nove kolekce jsou prochazeny cyklem while dokud nejsou obe kolekce prazdne
-        while (!serazeneMensi.isEmpty() || !serazeneVetsi.isEmpty()) {
-            // v kazde iteraci cyklu se z obou kolekci odebere jejich prostredni prvek
-            if (!serazeneMensi.isEmpty()) {
-                vkladanyMensi = serazeneMensi.remove((int) (serazeneMensi.size() / 2));
-            }
-
-            if (!serazeneVetsi.isEmpty()) {
-                vkladanyVetsi = serazeneVetsi.remove((int) (serazeneVetsi.size() / 2));
-            }
-
-            // ktery se vlozi do noveho stromu
-            if (vkladanyMensi != null) {
-                if (aktualniKlic == ETypKlice.GPS) novyStrom.vloz(vkladanyMensi.getLokace(), vkladanyMensi);
-                else novyStrom.vloz(vkladanyMensi.getNazev(), vkladanyMensi);
-            }
-
-            if (vkladanyVetsi != null) {
-                if (aktualniKlic == ETypKlice.GPS) novyStrom.vloz(vkladanyVetsi.getLokace(), vkladanyVetsi);
-                else novyStrom.vloz(vkladanyVetsi.getNazev(), vkladanyVetsi);
-            }
+            prebudujRekurze(new ArrayList<Zamek>(serazene.subList(0, (int) (serazene.size() / 2))));
+            prebudujRekurze(new ArrayList<Zamek>(serazene.subList((int) (serazene.size() / 2), serazene.size())));
         }
-        
-        // ...stary strom je zrusen
-        zrus();
-
-        // a je nahrazen novym stromem...
-        this.strom = novyStrom;
     }
 
     @Override

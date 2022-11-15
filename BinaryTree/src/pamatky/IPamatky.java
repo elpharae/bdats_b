@@ -3,6 +3,7 @@ package pamatky;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
 
+import ads.AbstrTable;
 import ads.AbstrTableException;
 import enums.ETypKlice;
 import enums.ETypProhlidky;
