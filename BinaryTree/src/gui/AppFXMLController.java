@@ -336,8 +336,10 @@ public class AppFXMLController {
         this.groupProhlidka.selectedToggleProperty().addListener((ov, ol, ne) -> {
             if (((RadioButton) this.groupProhlidka.getSelectedToggle()).getText().equals("Hluboka")) {
                 this.aktualniProhlidka = ETypProhlidky.HLUBOKA;
+                naplnListView();
             } else {
                 this.aktualniProhlidka = ETypProhlidky.SIROKA;
+                naplnListView();
             }
         });
 
@@ -355,7 +357,7 @@ public class AppFXMLController {
                     naplnListView();
                 }
             } catch (PamatkyException e) {
-                errorDialog(e.getMessage());
+                // neni treba osetrovat
             }
         });
     }

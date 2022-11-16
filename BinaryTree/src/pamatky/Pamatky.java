@@ -10,13 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
-
-import ads.AbstrDoubleListException;
-import ads.AbstrFifo;
-import ads.AbstrLifo;
 import ads.AbstrTable;
 import ads.AbstrTableException;
-import ads.IAbstrLifoFifo;
 import enums.ETypKlice;
 import enums.ETypProhlidky;
 
@@ -278,13 +273,11 @@ public class Pamatky implements IPamatky {
 
     private void prebudujRekurze(ArrayList<Zamek> serazene) {
         if (!serazene.isEmpty()) {
-            Zamek koren = serazene.remove((int) (serazene.size() / 2));
-            
+            Zamek koren = serazene.get((int) (serazene.size() / 2));
             this.strom.vloz(this.aktualniKlic == ETypKlice.GPS ? koren.getLokace() : koren.getNazev(), koren);
-            
 
-            prebudujRekurze(new ArrayList<Zamek>(serazene.subList(0, (int) (serazene.size() / 2))));
-            prebudujRekurze(new ArrayList<Zamek>(serazene.subList((int) (serazene.size() / 2), serazene.size())));
+            prebudujRekurze(new ArrayList<Zamek>(serazene.subList(0, serazene.indexOf(koren))));
+            prebudujRekurze(new ArrayList<Zamek>(serazene.subList(serazene.indexOf(koren) + 1, serazene.size())));
         }
     }
 
