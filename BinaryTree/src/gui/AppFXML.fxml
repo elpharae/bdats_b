@@ -15,7 +15,7 @@
    <left>
       <ListView fx:id="listView" prefHeight="580.0" prefWidth="398.0" BorderPane.alignment="CENTER" />
    </left>
-   <center>
+   <right>
       <FlowPane alignment="CENTER" columnHalignment="CENTER" orientation="VERTICAL" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <Label text="Pamatky">
@@ -25,25 +25,25 @@
             </Label>
             <FlowPane alignment="CENTER" prefHeight="470.0" prefWidth="379.0">
                <children>
-                  <FlowPane alignment="BASELINE_LEFT" columnHalignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="200.0" rowValignment="TOP">
+                  <FlowPane alignment="BASELINE_LEFT" columnHalignment="CENTER" hgap="10.0" prefHeight="42.0" prefWidth="271.0" rowValignment="TOP">
                      <children>
                         <Label text="Nazev" />
-                        <TextField fx:id="inputNazev" promptText="Pamatka" />
+                        <TextField fx:id="inputNazev" prefHeight="25.0" prefWidth="192.0" promptText="Pamatka" />
                      </children>
                   </FlowPane>
-                  <FlowPane alignment="BASELINE_LEFT" columnHalignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="200.0" rowValignment="TOP">
+                  <FlowPane alignment="BASELINE_LEFT" columnHalignment="CENTER" hgap="10.0" prefHeight="42.0" prefWidth="273.0" rowValignment="TOP">
                      <children>
                         <Label text="Zem. sirka" />
-                        <TextField fx:id="inputSirka" prefHeight="25.0" prefWidth="128.0" promptText="12.345678 (°)" />
+                        <TextField fx:id="inputSirka" prefHeight="25.0" prefWidth="172.0" promptText="12.345678 (°)" />
                      </children>
                   </FlowPane>
-                  <FlowPane alignment="BASELINE_LEFT" columnHalignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="200.0" rowValignment="TOP">
+                  <FlowPane alignment="BASELINE_LEFT" columnHalignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="273.0" rowValignment="TOP">
                      <children>
                         <Label text="Zem. delka" />
-                        <TextField fx:id="inputDelka" prefHeight="25.0" prefWidth="124.0" promptText="12.345678 (°)" />
+                        <TextField fx:id="inputDelka" prefHeight="25.0" prefWidth="167.0" promptText="12.345678 (°)" />
                      </children>
                   </FlowPane>
-                  <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="268.0" prefWidth="397.0" vgap="10.0">
+                  <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="268.0" prefWidth="450.0" vgap="10.0">
                      <children>
                         <Button fx:id="btnVlozit" mnemonicParsing="false" onAction="#vlozit" text="Vlozit" />
                         <Button fx:id="btnPromazat" mnemonicParsing="false" onAction="#promazat" text="Promazat" />
@@ -57,7 +57,7 @@
                         <Button fx:id="btnPodleKlice" mnemonicParsing="false" onAction="#najitPodleKlice" prefHeight="25.0" prefWidth="102.0" text="Najit podle klice" />
                         <Button fx:id="btnProhlidka" mnemonicParsing="false" onAction="#zobrazitProhlidku" text="Zobrazit prohlidku" />
                         <Button fx:id="btnNejblizsi" mnemonicParsing="false" onAction="#najitNejblizsi" text="Najdi nejblizsi" />
-                        <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="200.0">
+                        <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="229.0">
                            <children>
                               <RadioButton mnemonicParsing="false" selected="true" text="GPS">
                                  <toggleGroup>
@@ -67,7 +67,7 @@
                               <RadioButton mnemonicParsing="false" text="Nazev" toggleGroup="$groupKlic" />
                            </children>
                         </FlowPane>
-                        <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="200.0">
+                        <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="288.0">
                            <children>
                               <RadioButton mnemonicParsing="false" selected="true" text="Hluboka">
                                  <toggleGroup>
@@ -77,12 +77,15 @@
                               <RadioButton mnemonicParsing="false" text="Siroka" toggleGroup="$groupProhlidka" />
                            </children>
                         </FlowPane>
+                        <Button fx:id="btnVybudovat" mnemonicParsing="false" onAction="#vybudovatHaldu" prefHeight="25.0" prefWidth="153.0" text="Vybudovat haldu" />
+                        <Button fx:id="btnOdebratMax" mnemonicParsing="false" onAction="#odebratMax" text="Odebrat s max prioritou" />
+                        <Button fx:id="btnZobrazitHaldu" mnemonicParsing="false" onAction="#zobrazitHaldu" text="Zobrazit haldu" />
                      </children>
                   </FlowPane>
-                  <TextArea fx:id="textArea" editable="false" prefHeight="142.0" prefWidth="399.0" />
+                  <TextArea fx:id="textArea" editable="false" prefHeight="142.0" prefWidth="402.0" />
                </children>
             </FlowPane>
          </children>
       </FlowPane>
-   </center>
+   </right>
 </BorderPane>

@@ -4,17 +4,17 @@ import java.util.Iterator;
 
 public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
 
-    private ListItem<T> prvni;
-    private ListItem<T> aktualni;
-    private ListItem<T> posledni;
+    private Node<T> prvni;
+    private Node<T> aktualni;
+    private Node<T> posledni;
 
-    private static class ListItem<T> {
+    private static class Node<T> {
 
         private final T data;
-        private ListItem<T> dalsi;
-        private ListItem<T> predchozi;
+        private Node<T> dalsi;
+        private Node<T> predchozi;
 
-        public ListItem(T data) {
+        public Node(T data) {
             this.data = data;
             this.predchozi = null;
             this.dalsi = null;
@@ -41,7 +41,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
     }
 
     private void vlozDoPrazdneho(T data) {
-        this.prvni = new ListItem<T>(data);
+        this.prvni = new Node<T>(data);
         this.prvni.predchozi = this.prvni;
         this.prvni.dalsi = this.prvni;
         this.posledni = this.prvni;
@@ -57,9 +57,9 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         } else {
             // inicializace vkladaneho prvku
             // urceni mist predchudce a naslednika v seznamu
-            ListItem<T> vkladany = new ListItem<T>(data);
-            ListItem<T> pred = this.posledni;
-            ListItem<T> po = this.prvni;
+            Node<T> vkladany = new Node<T>(data);
+            Node<T> pred = this.posledni;
+            Node<T> po = this.prvni;
 
             // navazani vztahu s nove pridanym prvkem
             vkladany.dalsi = po;
@@ -82,9 +82,9 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         } else {
             // inicializace vkladaneho prvku
             // urceni mist predchudce a naslednika v seznamu
-            ListItem<T> vkladany = new ListItem<T>(data);
-            ListItem<T> pred = this.posledni;
-            ListItem<T> po = this.prvni;
+            Node<T> vkladany = new Node<T>(data);
+            Node<T> pred = this.posledni;
+            Node<T> po = this.prvni;
 
             // navazani vztahu s nove pridanym prvkem
             vkladany.dalsi = po;
@@ -108,9 +108,9 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         } else {
             // inicializace vkladaneho prvku
             // urceni mist predchudce a naslednika v seznamu
-            ListItem<T> vkladany = new ListItem<T>(data);
-            ListItem<T> pred = this.aktualni;
-            ListItem<T> po = this.aktualni.dalsi;
+            Node<T> vkladany = new Node<T>(data);
+            Node<T> pred = this.aktualni;
+            Node<T> po = this.aktualni.dalsi;
 
             // navazani vztahu s nove pridanym prvkem
             vkladany.dalsi = po;
@@ -130,9 +130,9 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         } else {
             // inicializace vkladaneho prvku
             // urceni mist predchudce a naslednika v seznamu
-            ListItem<T> vkladany = new ListItem<T>(data);
-            ListItem<T> pred = this.aktualni.predchozi;
-            ListItem<T> po = this.aktualni;
+            Node<T> vkladany = new Node<T>(data);
+            Node<T> pred = this.aktualni.predchozi;
+            Node<T> po = this.aktualni;
 
             // navazani vztahu s nove pridanym prvkem
             vkladany.dalsi = po;
@@ -146,7 +146,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
     public T zpristupniAktualni() throws AbstrDoubleListException {
         if (jePrazdny()) throw new AbstrDoubleListException("Seznam prazdny");
 
-        ListItem<T> vybrany = this.aktualni;
+        Node<T> vybrany = this.aktualni;
         return vybrany.data;
     }
 
@@ -210,9 +210,9 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
 
         // inicializace odebiraneho prvku
         // urceni mist predchudce a naslednika v seznamu
-        ListItem<T> odebirany = this.aktualni;
-        ListItem<T> pred = this.aktualni.predchozi;
-        ListItem<T> po = this.aktualni.dalsi;
+        Node<T> odebirany = this.aktualni;
+        Node<T> pred = this.aktualni.predchozi;
+        Node<T> po = this.aktualni.dalsi;
 
         // navazani vztahu predchudce a naslednika tak, 
         // aby zmizel odebirany prvek
@@ -236,9 +236,9 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
 
         // inicializace odebiraneho prvku
         // urceni mist predchudce a naslednika v seznamu
-        ListItem<T> odebirany = this.prvni;
-        ListItem<T> pred = this.prvni.predchozi;
-        ListItem<T> po = this.prvni.dalsi;
+        Node<T> odebirany = this.prvni;
+        Node<T> pred = this.prvni.predchozi;
+        Node<T> po = this.prvni.dalsi;
 
         // v pripade, ze v seznamu je pouze jeden prvek
         // vymaz cely seznam
@@ -273,9 +273,9 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
 
         // inicializace odebiraneho prvku
         // urceni mist predchudce a naslednika v seznamu
-        ListItem<T> odebirany = this.posledni;
-        ListItem<T> pred = this.posledni.predchozi;
-        ListItem<T> po = this.posledni.dalsi;
+        Node<T> odebirany = this.posledni;
+        Node<T> pred = this.posledni.predchozi;
+        Node<T> po = this.posledni.dalsi;
 
         // v pripade, ze v seznamu je pouze jeden prvek
         // vymaz cely seznam
@@ -312,9 +312,9 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
 
         // inicializace odebiraneho prvku
         // urceni mist predchudce a naslednika v seznamu
-        ListItem<T> odebirany = this.aktualni.dalsi;
-        ListItem<T> pred = this.aktualni;
-        ListItem<T> po = this.aktualni.dalsi.dalsi;
+        Node<T> odebirany = this.aktualni.dalsi;
+        Node<T> pred = this.aktualni;
+        Node<T> po = this.aktualni.dalsi.dalsi;
 
         // v pripade, ze v seznamu je pouze jeden prvek
         // vymaz cely seznam
@@ -343,9 +343,9 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
 
         // inicializace odebiraneho prvku
         // urceni mist predchudce a naslednika v seznamu
-        ListItem<T> odebirany = this.aktualni.predchozi;
-        ListItem<T> pred = this.aktualni.predchozi.predchozi;
-        ListItem<T> po = this.aktualni;
+        Node<T> odebirany = this.aktualni.predchozi;
+        Node<T> pred = this.aktualni.predchozi.predchozi;
+        Node<T> po = this.aktualni;
 
         // v pripade, ze v seznamu je pouze jeden prvek
         // vymaz cely seznam
@@ -366,7 +366,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
     public Iterator<T> iterator() {
         return new Iterator<T>() {
 
-            private ListItem<T> akt = prvni;
+            private Node<T> akt = prvni;
             private boolean init = false;
 
             @Override

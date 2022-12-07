@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
+import ads.AbstrHeap;
+import ads.AbstrHeapException;
 import ads.AbstrTable;
 import ads.AbstrTableException;
 import enums.ETypKlice;
@@ -18,12 +20,14 @@ import enums.ETypProhlidky;
 public class Pamatky implements IPamatky {
 
     private AbstrTable strom;
+    private AbstrHeap halda;
     private ETypKlice aktualniKlic;
 
     private static final float PREVOD_NA_STUPNE = 1/60f;
 
     public Pamatky() {
         this.strom = new AbstrTable();
+        this.halda = new AbstrHeap();
         this.aktualniKlic = ETypKlice.GPS;
     }
 
@@ -292,6 +296,42 @@ public class Pamatky implements IPamatky {
         if (typProhlidky == null) throw new NullPointerException("Spatne zvoleny typ prohlidky");
 
         return strom.iterator(typProhlidky);
+    }
+
+    public Iterator<Zamek> iteratorHalda() throws PamatkyException {
+        if (this.halda.jePrazdny()) throw new PamatkyException("Neni co prohlizet, halda je prazdna");
+
+        return (Iterator<Zamek>) this.halda.iterator();
+    }
+
+    public void nastavAktualniPozici(GPS lokace) throws PamatkyException {
+        if (lokace == null) throw new PamatkyException("Nespravne zadana aktualni pozice");
+
+        Iterator<Zamek> it = (Iterator<Zamek>) this.strom.iterator(ETypProhlidky.SIROKA);
+        while (it.hasNext()) {
+            Zamek obj = (Zamek) it.next();
+            obj.getLokace().setVzdalenost(lokace);
+        }
+    }
+
+    public void vybudujHaldu() throws PamatkyException {
+        if (this.strom.jePrazdny()) throw new PamatkyException("Neni z ceho vybudovat, strom je prazdny");
+
+        this.halda.zrus();
+        Iterator<Zamek> it = (Iterator<Zamek>) this.strom.iterator(ETypProhlidky.SIROKA);
+        while (it.hasNext()) {
+            Zamek obj = (Zamek) it.next();
+            if (obj.getLokace().getVzdalenost() == -1f) throw new PamatkyException("Nebyla nastavena aktualni pozice");
+            this.halda.vloz((Zamek) it.next());
+        }
+    }
+
+    public Zamek odeberMaxHalda() throws PamatkyException {
+        try {
+            return (Zamek) this.halda.odeberMax();
+        } catch (AbstrHeapException e) {
+            throw new PamatkyException("Neni z ceho odebirat, halda je prazdna");
+        }
     }
 
     public ETypKlice getAktualniKlic() {

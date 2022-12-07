@@ -9,7 +9,7 @@
             "name": "Launch App",
             "request": "launch",
             "mainClass": "gui.App",
-            "projectName": "BinaryTree_ddc8ca1a",
+            "projectName": "BinaryTree_a5ef5bf4",
             "vmArgs": "--module-path \"C:/Program Files/Java/javafx-sdk-19/lib\" --add-modules javafx.controls,javafx.fxml"
         }
     ]

@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.ResourceBundle;
-
 import ads.AbstrTableException;
 import enums.ETypKlice;
 import enums.ETypProhlidky;
@@ -34,6 +33,15 @@ public class AppFXMLController {
 
     @FXML
     private URL location;
+
+    @FXML
+    private Button btnVybudovat;
+
+    @FXML
+    private Button btnZobrazitHaldu;
+
+    @FXML
+    private Button btnOdebratMax;
 
     @FXML
     private Button btnNahratUkazkove;
@@ -323,6 +331,40 @@ public class AppFXMLController {
         alert.setContentText(contentText);
 
         alert.showAndWait();
+    }
+
+    @FXML
+    void vybudovatHaldu(ActionEvent event) {
+        try {
+            GPS lokace = new GPS((this.inputSirka.getText() + " " + this.inputDelka.getText()).trim());
+
+            this.pamatky.nastavAktualniPozici(lokace);
+            this.pamatky.vybudujHaldu();
+        } catch (PamatkyException | IllegalArgumentException e) {
+            errorDialog(e.getMessage());
+        }
+    }
+
+    @FXML
+    void zobrazitHaldu(ActionEvent event) {
+        try {
+            Iterator<Zamek> it = this.pamatky.iteratorHalda();
+            ProhlidkaDialog.zobrazOkno(it);
+        } catch (NullPointerException | PamatkyException e) {
+            errorDialog(e.getMessage());
+        }
+    }
+
+    @FXML
+    void odebratMax(ActionEvent event) {
+        try {
+            Zamek odebirany = this.pamatky.odeberMaxHalda();
+
+            textArea.setText("Pamatka s nejvyssi prioritou:\n" + odebirany);
+            zobrazitHaldu(event);
+        } catch (PamatkyException e) {
+            errorDialog(e.getMessage());
+        }
     }
 
     @FXML

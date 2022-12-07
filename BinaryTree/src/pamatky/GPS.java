@@ -10,6 +10,8 @@ public class GPS implements IGPS, Comparable<GPS> {
     public static float MIN_DELKA = 12f;
     public static float MAX_DELKA = 19f;
 
+    private float vzdalenost;
+
     public GPS(float sirka, float delka) {
         if (sirka < GPS.MIN_SIRKA || sirka > GPS.MAX_SIRKA || delka < GPS.MIN_DELKA || delka > GPS.MAX_DELKA) {
             throw new IllegalArgumentException("Pouze Ceske uzemi");
@@ -17,6 +19,7 @@ public class GPS implements IGPS, Comparable<GPS> {
 
         this.sirka = sirka;
         this.delka = delka;
+        this.vzdalenost = -1f;
     }
 
     public GPS(String souradnice) {
@@ -35,8 +38,6 @@ public class GPS implements IGPS, Comparable<GPS> {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Spatne zadana lokace");
         }
-
-
     } 
 
     public float getSirka() {
@@ -64,6 +65,8 @@ public class GPS implements IGPS, Comparable<GPS> {
         return (float) (POLOMER_ZEME * c * 1000);
     }
 
+
+
     @Override
     public String toString() {
         return this.sirka + " " + this.delka;
@@ -74,6 +77,14 @@ public class GPS implements IGPS, Comparable<GPS> {
         if (this.sirka + this.delka < gps.sirka + gps.delka) return -1;
         else if (this.sirka + this.delka > gps.sirka + gps.delka) return 1;
         else return 0;
+    }
+
+    public void setVzdalenost(GPS gps) {
+        this.vzdalenost = vzdalenostOd(gps);
+    }
+
+    public float getVzdalenost() {
+        return this.vzdalenost;
     }
     
 }
